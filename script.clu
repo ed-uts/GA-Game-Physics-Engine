@@ -1,0 +1,53 @@
+Line = {
+    x = _P(1); y = _P(2); z = _P(3);
+    x * (e0 ^ e1) + y * (e0 ^ e2) + z * (e0 ^ e3);
+}
+
+Point = {
+    px = _P(1); py = _P(2); pz = _P(3);
+    e0 + px * e1 + py * e2 + pz * e3;
+}
+
+F = {
+    M = _P(1); 
+    gx = _P(2); gy = _P(3); gz = _P(4); 
+    wx = _P(5); wy = _P(6); wz = _P(7), 
+    fx = _P(8); fy = _P(9); fz = _P(10);
+    
+    gravity 	= Line(gx, gy, gz);
+    wind 	= Line(wx, wy, wz);
+    friction 	= Line(fx, fy, fz);
+
+    dG = *(~M * gravity * M);
+    dW = *(~M * wind * M);
+    dF = *(~M * friction * M);
+    dG + dW + dF
+}
+
+nextM = {
+    M = _P(1);
+    B = _P(2);
+    dM = -0.5 * M * B;
+    M + dM
+}
+
+nextB = {
+    M = _P(1);
+    B = _P(2);
+    gx = _P(3); gy = _P(4); gz = _P(5); 
+    wx = _P(6); wy = _P(7); wz = _P(8); 
+    fx = _P(9); fy = _P(10); fz = _P(11);
+    
+    B_dual = *B;
+    forque = F(M,gx,gy,gz,wx,wy,wz,fx,fy,fz);
+    dB = *(forque -0.5 * (B_dual * B - B * B_dual));
+    B + dB
+}
+
+M = m0 + Line(mx, my, mz);
+B = Line(bx, by, bz);
+P = Point(px, py, pz);
+
+?MNew = nextM(M,B);
+?BNew = nextB(M,B,gx,gy,gz,wx,wy,wz,fx,fy,fz);
+?PNew = MNew * P * ~MNew;
