@@ -29,6 +29,8 @@ def generate_terrain(size, octaves=10, scale_factor=100, max_height=1000):
     # Add random noise for sharpness
     terrain += np.random.normal(scale=70, size=(size, size))
 
+    save_data(terrain, 'terrain.txt')
+
     return terrain
 
 def reduce_fourier_descriptor(descriptor, num_coefficients):
@@ -71,7 +73,18 @@ def plot_fourier_descriptor(descriptor, title, filename):
     plt.colorbar()
     plt.savefig(filename, dpi=600)
     plt.close()
-    
+
+def save_data(data, filename):
+    file = open(filename, 'w')
+    count = 0
+    for element in data:
+        for item in element:
+            if not item == 0:
+                count += 1
+
+#    	print(str(element), file=file)
+    print(str(count), file=file)
+
 # Terrain parameters
 size = 1000
 
@@ -92,7 +105,9 @@ index = 0
 # Save plots
 
 plot_3d_terrain(terrain, index, 'Plot of 1,000,000 generated points in 3D Euclidean space representing terrain', 'original.png')
+
 for coef, recon_terrain, reduced_fd in zip(coefficients_to_reduce, reconstructed_terrains, reduced_fourier_descriptors):
     index += 1
     plot_3d_terrain(recon_terrain, index, f'Mesh reconstructed from Fourier Descriptor with {coef} coefficients', f'reconstructed_{coef}.png')
+    save_data(reduced_fd, 'fourier_descriptor_' + str(coef) + '.txt')
 #    plot_fourier_descriptor(reduced_fd, f'Fourier Descriptor with {coef} coefficients', f'fourier_{coef}.png')
